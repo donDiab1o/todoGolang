@@ -2,35 +2,56 @@ package main
 
 import (
 	"database/sql"
-	"flag"
+	"fmt"
 	"log"
 	"net/http"
-
+	"os"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
+var _ = godotenv.Load()
+var DataBase, dataBaseErr = sql.Open("postgres", getConnectionConfig())
+var Port = os.Getenv("PORT")
+
 func main() {
-	if dbErr != nil && dbErr != db.Ping() {
-		panic(dbErr)
-	}
-	defer db.Close()
 
+	checkConnectionDB()
 
-	log.Print("connected to db")
-
-	flag.Parse()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/todo/delete", deleteTask)
-	mux.HandleFunc("/todo/update", updateTask)
 	mux.HandleFunc("/todo/add", addTask)
 	mux.HandleFunc("/tasks", showTask)
 
-	log.Printf("Server start on %d \n", 4000)
+	log.Printf("Server start on %v \n", Port)
 
-	err1 := http.ListenAndServe(":4000", mux)
-	log.Fatal(err1)
+	errMuxServer := http.ListenAndServe((":" + Port), mux)
+	log.Fatal(errMuxServer)
 
 }
 
-var ConnStr = "user=process.env.DB_NAME dbname=todo password=root host=localhost sslmode=disable"
-var db, dbErr = sql.Open("postgres", ConnStr)
+func getConnectionConfig() string {
+
+	user := os.Getenv("USERDB")
+	dbname := os.Getenv("DB_NAME")
+	password := os.Getenv("PASSWORD")
+	host := os.Getenv("HOSTDB")
+	sslmode := os.Getenv("SSLMODE")
+
+	return fmt.Sprintf("user=%s dbname=%s password=%s host=%s sslmode=%s", user, dbname, password, host, sslmode)
+}
+
+func checkConnectionDB() {
+	if dataBaseErr != nil {
+		panic(dataBaseErr)
+	}
+
+	dataBaseErr = DataBase.Ping()
+	if dataBaseErr != nil {
+		panic(dataBaseErr)
+	}
+
+	log.Printf("\nSuccessfully connected to database!\n")
+
+	return
+}

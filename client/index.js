@@ -43,7 +43,7 @@ const setList = (data) => {
 		button.dataset.ID = ID
 
 		button.innerHTML = "удалить"
-		p.appendChild(but)
+		p.appendChild(button)
 	})
 
 	addDeleteButtons()
