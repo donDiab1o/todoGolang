@@ -14,11 +14,11 @@ Services which we need to use this app: Nginx, PostgreSQL(in my case in docker)
 
 Create and configure ur Nginx with locale folder of app, like this:
 
+
 server {
 	listen "URPORT" default_server;
 	listen [::]:"URPORT" default_server;
-
-
+	
 	root /var/www/todo/client; (ur destination addr)
 
 	index index.html;
@@ -34,8 +34,9 @@ server {
         	etag off;
 	}
 	add_header 'Access-Control-Allow-Origin' 'origin-list';
-
 }
+
+
 
 So u can start nginx and check in browser localhost on ur port
 
